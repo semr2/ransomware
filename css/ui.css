@@ -1,0 +1,205 @@
+/* ============ Overlay UI: panels, buttons, feedback, phone, captions ============ */
+
+/* ---- Generic buttons ---- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border-radius: 10px; border: 1px solid transparent;
+  padding: 11px 22px; font-size: 14.5px; font-weight: 600; cursor: pointer;
+  transition: transform .15s ease, box-shadow .2s ease, background .2s ease;
+  min-height: 44px;
+}
+.btn:active { transform: translateY(1px); }
+.btn-primary { background: linear-gradient(180deg, var(--teal-500), var(--teal-600)); color: #06281f; }
+.btn-primary:hover { box-shadow: 0 6px 18px rgba(20, 184, 166, .35); }
+.btn-secondary { background: rgba(148, 163, 184, .14); color: var(--paper-100); border-color: rgba(148, 163, 184, .35); }
+.btn-secondary:hover { background: rgba(148, 163, 184, .24); }
+.btn-danger { background: linear-gradient(180deg, #ef4444, var(--red-700)); color: #fff; }
+.btn-ghost { background: transparent; color: var(--paper-200); border-color: rgba(148,163,184,.3); }
+.btn-ghost:hover { border-color: var(--teal-500); color: #fff; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+html.reduced-motion .btn { transition: none; }
+
+/* ---- Centered panel (intro, choices, dialogs) ---- */
+.ui-panel {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  z-index: 50; width: min(620px, 92vw); max-height: 82vh; overflow: auto;
+  background: linear-gradient(180deg, rgba(16, 29, 51, .97), rgba(11, 21, 36, .97));
+  border: 1px solid rgba(148, 163, 184, .25);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 26px 30px;
+}
+.ui-panel h2 { font-size: 21px; margin-bottom: 10px; color: #fff; }
+.ui-panel p  { font-size: 14.5px; line-height: 1.6; color: #cbd5e1; }
+.ui-panel .choice-stack { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+.ui-panel .choice-stack .btn { justify-content: flex-start; text-align: left; }
+.ui-panel .small-note { font-size: 12px; color: var(--ink-400); margin-top: 14px; }
+
+.panel-fade-in { animation: panelIn .35s ease both; }
+html.reduced-motion .panel-fade-in { animation: none; }
+@keyframes panelIn {
+  from { opacity: 0; transform: translate(-50%, -48%); }
+  to   { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+/* ---- Feedback modal ---- */
+.feedback-modal .verdict {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 12px; font-weight: 700; letter-spacing: .12em;
+  padding: 5px 12px; border-radius: 999px; margin-bottom: 12px;
+}
+.feedback-modal .verdict.good { background: rgba(22, 163, 74, .18); color: #4ade80; border: 1px solid rgba(74, 222, 128, .4); }
+.feedback-modal .verdict.warn { background: rgba(220, 38, 38, .15); color: #f87171; border: 1px solid rgba(248, 113, 113, .4); }
+.feedback-modal .verdict.partial { background: rgba(245, 158, 11, .15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, .4); }
+.feedback-modal h2 { font-size: 19px; }
+.feedback-modal .why {
+  margin-top: 12px; padding: 12px 14px; border-radius: 10px;
+  background: rgba(148, 163, 184, .08); font-size: 13.5px; line-height: 1.6; color: #e2e8f0;
+}
+.feedback-modal .why b { color: #fff; }
+
+/* ---- Hint chip ---- */
+#hint-chip {
+  position: absolute; right: 18px; bottom: 88px; z-index: 45;
+  max-width: 320px; padding: 12px 16px;
+  background: rgba(15, 40, 38, .96); color: #99f6e4;
+  border: 1px solid rgba(45, 212, 191, .45); border-radius: 12px;
+  font-size: 13px; line-height: 1.5; box-shadow: var(--shadow-md);
+  display: none;
+}
+#hint-chip.visible { display: block; animation: hintIn .4s ease; }
+html.reduced-motion #hint-chip.visible { animation: none; }
+@keyframes hintIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+#hint-chip .hint-tag { font-size: 10px; letter-spacing: .18em; font-weight: 700; color: #5eead4; display: block; margin-bottom: 4px; }
+
+/* ---- Caption bar ---- */
+#caption-bar {
+  position: absolute; left: 50%; bottom: 66px; transform: translateX(-50%);
+  z-index: 46; max-width: min(720px, 90vw);
+  background: rgba(2, 8, 20, .88); color: #fff;
+  border: 1px solid rgba(148, 163, 184, .3); border-radius: 10px;
+  padding: 10px 18px; font-size: 15px; line-height: 1.5; text-align: center;
+}
+#caption-bar[hidden] { display: none; }
+#caption-bar .speaker { color: var(--teal-500); font-weight: 700; margin-right: 6px; }
+
+/* ---- Phone call overlay ---- */
+#phone-layer {
+  position: absolute; inset: 0; z-index: 48; display: none;
+  align-items: center; justify-content: center;
+  background: radial-gradient(700px 500px at 50% 40%, rgba(11, 21, 36, .35), rgba(11, 21, 36, .88));
+}
+#phone-layer.visible { display: flex; }
+.phone-device {
+  width: 280px; border-radius: 38px; padding: 14px 12px 22px;
+  background: linear-gradient(180deg, #1e293b, #0f172a);
+  border: 1px solid rgba(148, 163, 184, .4);
+  box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,.08);
+}
+.phone-device .phone-speaker { width: 70px; height: 5px; border-radius: 3px; margin: 4px auto 14px; background: #334155; }
+.phone-screen {
+  border-radius: 24px; background: linear-gradient(180deg, #020617, #0b1524);
+  min-height: 380px; padding: 18px 16px; color: #e2e8f0;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.phone-screen .caller-id { text-align: center; font-size: 12px; color: var(--ink-400); }
+.phone-screen .caller-name { text-align: center; font-size: 22px; font-weight: 700; color: #fff; }
+.phone-screen .call-status { text-align: center; font-size: 12px; color: var(--green-600); }
+.phone-screen .call-script {
+  flex: 1; font-size: 14px; line-height: 1.6; color: #cbd5e1;
+  background: rgba(148, 163, 184, .07); border-radius: 14px; padding: 14px;
+}
+.phone-screen .call-script .caller-line b { color: #7dd3fc; }
+.phone-actions { display: flex; flex-direction: column; gap: 8px; }
+.phone-device.ringing .phone-screen { animation: ringPulse 1.2s ease-in-out infinite; }
+html.reduced-motion .phone-device.ringing .phone-screen { animation: none; }
+@keyframes ringPulse {
+  0%, 100% { box-shadow: 0 0 0 rgba(20, 184, 166, 0); }
+  50% { box-shadow: 0 0 26px rgba(20, 184, 166, .35) inset; }
+}
+
+/* ---- Voicemail variant ---- */
+.voicemail-badge {
+  display: inline-flex; gap: 6px; align-items: center;
+  background: rgba(245, 158, 11, .12); border: 1px solid rgba(245, 158, 11, .4);
+  color: #fcd34d; font-size: 12px; padding: 4px 10px; border-radius: 999px; margin-bottom: 10px;
+}
+
+/* ---- Object labels (3D hover / keyboard focus) ---- */
+.obj-label {
+  position: absolute; z-index: 42; transform: translate(-50%, -130%);
+  background: rgba(11, 21, 36, .92); color: #fff;
+  border: 1px solid rgba(45, 212, 191, .55);
+  padding: 6px 12px; border-radius: 8px; font-size: 12.5px; white-space: nowrap;
+  pointer-events: none; box-shadow: var(--shadow-md);
+}
+.obj-label::after {
+  content: attr(data-key); margin-left: 8px; color: var(--teal-500);
+  font-size: 10px; border: 1px solid rgba(45, 212, 191, .5); border-radius: 4px; padding: 0 5px;
+}
+.obj-focus-ring {
+  position: absolute; z-index: 41; transform: translate(-50%, -50%);
+  border: 3px solid var(--teal-500); border-radius: 14px;
+  box-shadow: 0 0 0 4px rgba(20, 184, 166, .25), var(--shadow-md);
+  pointer-events: none; transition: left .18s ease, top .18s ease, width .18s ease, height .18s ease;
+}
+html.reduced-motion .obj-focus-ring { transition: none; }
+
+/* ---- 2D interactive objects list ---- */
+#objects-2d {
+  position: absolute; left: 18px; top: 84px; z-index: 44;
+  display: none; flex-direction: column; gap: 8px; max-width: 300px;
+}
+html.mode-2d #objects-2d { display: flex; }
+.object-btn-2d {
+  display: flex; align-items: center; gap: 10px; text-align: left;
+  background: rgba(16, 29, 51, .92); color: var(--paper-100);
+  border: 1px solid rgba(148, 163, 184, .35); border-radius: 12px;
+  padding: 10px 14px; cursor: pointer; font-size: 13.5px;
+  transition: border-color .2s, background .2s;
+}
+.object-btn-2d:hover { border-color: var(--teal-500); }
+.object-btn-2d .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.object-btn-2d .sub { display: block; font-size: 11px; color: var(--ink-400); margin-top: 2px; }
+
+/* ---- Status badges (clean device / compromised) ---- */
+.status-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 11.5px; font-weight: 700; letter-spacing: .1em;
+  padding: 5px 12px; border-radius: 999px;
+}
+.status-badge.clean  { background: rgba(22, 163, 74, .16); color: #4ade80; border: 1px solid rgba(74, 222, 128, .45); }
+.status-badge.bad    { background: rgba(220, 38, 38, .16); color: #f87171; border: 1px solid rgba(248, 113, 113, .45); }
+.status-badge.isolated { background: rgba(245, 158, 11, .14); color: #fbbf24; border: 1px solid rgba(251, 191, 36, .45); }
+.status-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.status-badge.clean .dot { animation: pulseDot 2s infinite; }
+.status-badge.bad .dot { animation: pulseDot .8s infinite; }
+html.reduced-motion .status-badge .dot { animation: none; }
+@keyframes pulseDot { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
+
+/* ---- Toast ---- */
+#toast {
+  position: absolute; left: 50%; top: 74px; transform: translateX(-50%);
+  z-index: 60; background: rgba(11, 21, 36, .95); color: var(--paper-100);
+  border: 1px solid rgba(148, 163, 184, .3); border-radius: 10px;
+  padding: 10px 18px; font-size: 13.5px; box-shadow: var(--shadow-md);
+  display: none; align-items: center; gap: 10px;
+}
+#toast.visible { display: inline-flex; animation: hintIn .3s ease; }
+html.reduced-motion #toast.visible { animation: none; }
+
+/* ---- Accessibility settings panel ---- */
+#a11y-panel {
+  position: absolute; top: 64px; right: 14px; z-index: 70;
+  width: 290px; background: rgba(11, 21, 36, .98);
+  border: 1px solid rgba(148, 163, 184, .3); border-radius: 14px;
+  box-shadow: var(--shadow-lg); padding: 18px; display: none;
+}
+#a11y-panel.open { display: block; }
+#a11y-panel h3 { font-size: 14px; color: #fff; margin-bottom: 12px; }
+#a11y-panel label {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 13px; color: #cbd5e1; padding: 8px 0; cursor: pointer; gap: 10px;
+}
+#a11y-panel input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--teal-500); }
+#a11y-panel .sep { border-top: 1px solid rgba(148, 163, 184, .15); margin: 8px 0; }

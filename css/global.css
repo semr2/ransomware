@@ -1,0 +1,151 @@
+/* ============ Ransomware Response — global layout & chrome ============ */
+:root {
+  --navy-900: #0b1524;
+  --navy-800: #101d33;
+  --navy-700: #16263f;
+  --teal-500: #14b8a6;
+  --teal-600: #0d9488;
+  --teal-100: #ccfbf1;
+  --amber-500: #f59e0b;
+  --red-600: #dc2626;
+  --red-700: #b91c1c;
+  --green-600: #16a34a;
+  --green-100: #dcfce7;
+  --ink-900: #0f172a;
+  --ink-600: #475569;
+  --ink-400: #94a3b8;
+  --paper-50: #f8fafc;
+  --paper-100: #f1f5f9;
+  --paper-200: #e2e8f0;
+  --shadow-lg: 0 24px 60px rgba(2, 8, 20, .45);
+  --shadow-md: 0 12px 28px rgba(2, 8, 20, .30);
+  --radius-lg: 14px;
+  --radius-md: 10px;
+  --font: "Segoe UI", "SF Pro Text", system-ui, -apple-system, Roboto, Arial, sans-serif;
+  --mono: "Cascadia Code", "SF Mono", Consolas, "Roboto Mono", monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  font-family: var(--font);
+  background: var(--navy-900);
+  color: var(--paper-50);
+}
+
+button { font-family: inherit; }
+
+#app { position: fixed; inset: 0; }
+
+/* ---- 3D / 2D stage ---- */
+#scene-canvas { position: absolute; inset: 0; display: block; }
+#scene-2d { position: absolute; inset: 0; display: none; }
+html.mode-2d #scene-2d { display: block; }
+html.mode-2d #scene-canvas { display: none; }
+
+/* 2D backdrop is a stylized illustration of the same office */
+#scene-2d {
+  background:
+    radial-gradient(1200px 500px at 70% -10%, #2e4462 0%, transparent 60%),
+    radial-gradient(900px 420px at 15% 110%, #1c2c45 0%, transparent 55%),
+    linear-gradient(180deg, #182a44 0%, #101d33 55%, #0b1524 100%);
+}
+#scene-2d .office-illus {
+  position: absolute; left: 50%; bottom: 6%; transform: translateX(-50%);
+  width: min(880px, 86vw);
+}
+#scene-2d .desk-line {
+  height: 4px; border-radius: 2px; margin: 26px 8px;
+  background: linear-gradient(90deg, transparent, #3b553a 0%, #3b553a 15%, #64748b 50%, #3b553a 85%, transparent);
+}
+
+/* ---- Persistent course header ---- */
+#course-header {
+  position: absolute; top: 0; left: 0; right: 0; z-index: 40;
+  display: flex; align-items: center; gap: 16px;
+  padding: 10px 18px;
+  background: linear-gradient(180deg, rgba(11, 21, 36, .96), rgba(11, 21, 36, .82) 70%, transparent);
+  backdrop-filter: blur(6px);
+  min-height: 58px;
+}
+#course-header .brand {
+  font-weight: 700; letter-spacing: .14em; font-size: 13px; color: var(--teal-100);
+  white-space: nowrap;
+}
+#course-header .brand b { color: #fff; }
+#step-indicator {
+  font-size: 13px; color: var(--paper-200); white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+#step-objective {
+  flex: 1; font-size: 13.5px; color: #cbd5e1;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+#step-objective b { color: #fff; font-weight: 600; }
+#progress-track {
+  position: absolute; left: 0; right: 0; bottom: -2px; height: 3px;
+  background: rgba(255, 255, 255, .08);
+}
+#progress-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--teal-600), var(--teal-500));
+  transition: width .6s ease;
+}
+html.reduced-motion #progress-fill { transition: none; }
+
+.header-btn {
+  border: 1px solid rgba(148, 163, 184, .35);
+  background: rgba(16, 29, 51, .65);
+  color: var(--paper-200);
+  border-radius: 8px; padding: 6px 11px; font-size: 12px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: background .2s, border-color .2s;
+}
+.header-btn:hover { background: rgba(30, 50, 80, .8); border-color: var(--teal-500); }
+#scorm-mode {
+  font-size: 10.5px; letter-spacing: .08em; color: var(--ink-400);
+  border: 1px dashed rgba(148, 163, 184, .4); border-radius: 6px;
+  padding: 4px 8px; white-space: nowrap;
+}
+
+/* ---- Loading screen ---- */
+#loading-screen {
+  position: absolute; inset: 0; z-index: 100;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 18px; text-align: center;
+  background:
+    radial-gradient(1000px 480px at 50% -15%, #1d3355 0%, transparent 60%),
+    linear-gradient(180deg, #0d1a2f, #0b1524);
+  transition: opacity .5s ease;
+}
+#loading-screen.hidden { opacity: 0; pointer-events: none; }
+#loading-screen .load-brand {
+  font-size: 12px; letter-spacing: .3em; color: var(--teal-500); font-weight: 700;
+}
+#loading-screen h1 { font-size: clamp(22px, 4vw, 34px); font-weight: 700; color: #fff; }
+#loading-screen .load-sub { color: var(--ink-400); font-size: 14px; }
+#load-bar-track {
+  width: min(420px, 70vw); height: 8px; border-radius: 4px;
+  background: rgba(255, 255, 255, .08); overflow: hidden;
+}
+#load-bar-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--teal-600), #2dd4bf);
+  transition: width .3s ease;
+}
+#load-status { font-size: 12px; color: var(--ink-400); font-variant-numeric: tabular-nums; }
+#loading-screen .shield {
+  width: 54px; height: 54px; margin-bottom: 4px;
+}
+
+/* ---- Error toast ---- */
+#error-toast {
+  position: absolute; left: 50%; bottom: 92px; transform: translateX(-50%);
+  z-index: 90; max-width: min(560px, 86vw);
+  background: #7f1d1d; color: #fecaca; border: 1px solid #b91c1c;
+  padding: 10px 16px; border-radius: 10px; font-size: 13px;
+  box-shadow: var(--shadow-md); display: none;
+}
+#error-toast.visible { display: block; }

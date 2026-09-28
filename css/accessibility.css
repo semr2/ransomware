@@ -1,0 +1,61 @@
+/* ============ Accessibility: focus visibility, reduced motion, 2D mode ============ */
+
+/* Visible focus everywhere — thickened when high-visibility is enabled */
+:focus-visible {
+  outline: 2px solid var(--teal-500);
+  outline-offset: 2px;
+}
+.focus-high-visibility :focus-visible {
+  outline: 4px solid #2dd4bf;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 8px rgba(45, 212, 191, .3);
+}
+
+/* Screen-reader-only utility */
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* Global reduced-motion switch — kills decorative motion app-wide */
+html.reduced-motion *,
+html.reduced-motion *::before,
+html.reduced-motion *::after {
+  animation-duration: .001s !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: .001s !important;
+  scroll-behavior: auto !important;
+}
+
+/* In reduced motion the 3D camera uses instant fades instead of tweens.
+   The fade veil is only shown for 3D camera moves. */
+#motion-veil {
+  position: absolute; inset: 0; z-index: 35; background: #0b1524;
+  opacity: 0; pointer-events: none; transition: opacity .18s ease;
+}
+#motion-veil.fade { opacity: 1; }
+
+/* 2D accessible mode refinements */
+html.mode-2d .obj-label { display: none; }
+html.mode-2d #objects-2d .object-btn-2d:focus-visible {
+  outline: 3px solid #2dd4bf; outline-offset: 2px;
+}
+
+/* Larger hit targets in 2D mode */
+html.mode-2d .object-btn-2d { min-height: 52px; }
+
+/* Honour the OS-level preference even before JS initializes */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001s !important;
+  }
+}
+
+/* High-contrast text alternatives for overlays over the 3D scene */
+@media (prefers-contrast: more) {
+  .ui-panel p, .feedback-modal .why { color: #f8fafc; }
+  #step-objective { color: #fff; }
+}
