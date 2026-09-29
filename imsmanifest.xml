@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SCORM 1.2 content manifest — Ransomware Response: The First 60 Minutes
+     (Northstar Dynamics fictional security-awareness training) -->
+<manifest identifier="NORTHSTAR-RANSOMWARE-RESPONSE-V1" version="1.2"
+          xmlns="http://www.imsproject.org/xsd/imscp_rootv1p1p2"
+          xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_rootv1p2"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <metadata>
+    <schema>ADL SCORM</schema>
+    <schemaversion>1.2</schemaversion>
+  </metadata>
+
+  <organizations default="NORTHSTAR-ORG">
+    <organization identifier="NORTHSTAR-ORG">
+      <title>Ransomware Response: The First 60 Minutes</title>
+      <item identifier="ITEM-SIMULATION" identifierref="RES-SCO" isvisible="true">
+        <title>Ransomware Response: The First 60 Minutes</title>
+      </item>
+    </organization>
+  </organizations>
+
+  <resources>
+    <resource identifier="RES-SCO" type="webcontent" adlcp:scormtype="sco" href="index.html">
+      <file href="imsmanifest.xml"/>
+      <file href="index.html"/>
+      <file href="css/accessibility.css"/>
+      <file href="css/desktop.css"/>
+      <file href="css/global.css"/>
+      <file href="css/ui.css"/>
+      <file href="js/accessibility.js"/>
+      <file href="js/audio.js"/>
+      <file href="js/course-state.js"/>
+      <file href="js/interactions.js"/>
+      <file href="js/main.js"/>
+      <file href="js/quiz.js"/>
+      <file href="js/scenario-engine.js"/>
+      <file href="js/scoring.js"/>
+      <file href="js/scorm.js"/>
+      <file href="lib/three.module.min.js"/>
+      <file href="scenes/env2d.js"/>
+      <file href="scenes/office.js"/>
+      <file href="scenarios/index.js"/>
+      <file href="scenarios/step00-introduction.js"/>
+      <file href="scenarios/step01-call.js"/>
+      <file href="scenarios/step02-it-request.js"/>
+      <file href="scenarios/step03-inbox.js"/>
+      <file href="scenarios/step04-phishing.js"/>
+      <file href="scenarios/step05-warning.js"/>
+      <file href="scenarios/step06-attack.js"/>
+      <file href="scenarios/step07-ransom.js"/>
+      <file href="scenarios/step08-containment.js"/>
+      <file href="scenarios/step09-clean-device.js"/>
+      <file href="scenarios/step10-credentials.js"/>
+      <file href="scenarios/step11-sender.js"/>
+      <file href="scenarios/step12-report.js"/>
+      <file href="scenarios/step13-debrief.js"/>
+      <file href="scenarios/step14-quiz.js"/>
+      <file href="ui/debrief.js"/>
+      <file href="ui/desktop.js"/>
+      <file href="ui/email.js"/>
+      <file href="ui/feedback.js"/>
+      <file href="ui/file-manager.js"/>
+      <file href="ui/login.js"/>
+      <file href="ui/phone.js"/>
+      <file href="ui/ransom-screen.js"/>
+      <file href="ui/ticketing.js"/>
+    </resource>
+  </resources>
+</manifest>

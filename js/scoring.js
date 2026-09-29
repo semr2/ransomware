@@ -38,7 +38,7 @@ export function computeFinalScore() {
   };
 }
 
-export function commitFinalResult() {
+export function commitFinalScore() {
   const result = computeFinalScore();
   state.finalScore = result.total;
   state.passed = result.passed;

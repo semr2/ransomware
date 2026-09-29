@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ransomware Response: The First 60 Minutes</title>
+  <meta name="description" content="Northstar Dynamics security awareness training — an interactive ransomware-response simulation. All companies, people, systems and events are fictional.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%232dd4bf' d='M12 2l8 3.5V11c0 5-3.4 8.7-8 10.4C7.4 19.7 4 16 4 11V5.5z'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/ui.css">
+  <link rel="stylesheet" href="css/desktop.css">
+  <link rel="stylesheet" href="css/accessibility.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- Environments: 3D canvas (default) and the accessible 2D illustration.
+         Only one is visible at a time; course state is identical in both. -->
+    <canvas id="scene-canvas" aria-label="3D office environment. Interactive objects are also listed in the Interactive objects panel."></canvas>
+    <div id="scene-2d"></div>
+
+    <!-- Persistent course header -->
+    <header id="course-header">
+      <span class="brand"><b>RANSOMWARE</b> RESPONSE</span>
+      <span id="step-indicator">Introduction</span>
+      <span id="step-objective"></span>
+      <span id="scorm-mode">SCORM MODE: —</span>
+      <button type="button" class="header-btn" id="btn-hint" aria-label="Show a hint for the current step">Hint</button>
+      <button type="button" class="header-btn" id="btn-a11y" aria-haspopup="dialog" aria-expanded="false" aria-label="Accessibility settings">Accessibility</button>
+      <div id="progress-track"><div id="progress-fill"></div></div>
+    </header>
+
+    <!-- Keyboard-accessible list of interactive objects (shown in 2D mode;
+         buttons are real DOM controls in both modes) -->
+    <nav id="objects-2d" aria-label="Interactive objects"></nav>
+
+    <!-- Monitor close-up stage: the NOVA Desktop is built inside by ui/desktop.js -->
+    <div id="screen-stage"></div>
+
+    <!-- Phone overlay layer (incoming call / conversation), built by ui/phone.js -->
+    <div id="phone-layer"></div>
+
+    <!-- Idle / on-demand hint chip -->
+    <div id="hint-chip" role="status"></div>
+
+    <!-- Transient toast notifications -->
+    <div id="toast" role="status"></div>
+
+    <!-- Captions for spoken dialogue -->
+    <div id="caption-bar" hidden></div>
+
+    <!-- Modal panels: decisions, feedback, welcome-back, debrief -->
+    <div id="overlay-root"></div>
+
+    <!-- Global error surface (never blocks progress) -->
+    <div id="error-toast" role="alert"></div>
+
+    <!-- Screen-reader announcements -->
+    <div id="sr-live" class="sr-only" aria-live="polite"></div>
+
+    <!-- Accessibility settings -->
+    <div id="a11y-panel" role="dialog" aria-label="Accessibility settings">
+      <h3>Accessibility Settings</h3>
+      <label>Captions
+        <input type="checkbox" id="opt-captions">
+      </label>
+      <label>Sound effects
+        <input type="checkbox" id="opt-sound">
+      </label>
+      <div class="sep" role="presentation"></div>
+      <label>Reduced motion
+        <input type="checkbox" id="opt-motion">
+      </label>
+      <label>High-visibility focus
+        <input type="checkbox" id="opt-focus">
+      </label>
+      <div class="sep" role="presentation"></div>
+      <label>Accessible 2D mode
+        <input type="checkbox" id="opt-2d" aria-describedby="opt-2d-note">
+      </label>
+      <p id="opt-2d-note" class="sr-only">Replaces the 3D office with a 2D illustration. The course content, decisions and scoring stay exactly the same.</p>
+    </div>
+
+    <!-- Loading screen -->
+    <div id="loading-screen">
+      <svg class="shield" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 2l8 3.5V11c0 5-3.4 8.7-8 10.4C7.4 19.7 4 16 4 11V5.5z" fill="#2dd4bf" opacity=".18"/>
+        <path d="M12 2l8 3.5V11c0 5-3.4 8.7-8 10.4C7.4 19.7 4 16 4 11V5.5z" stroke="#2dd4bf" stroke-width="1.4"/>
+        <path d="M8.8 12.1l2.2 2.2 4.2-4.6" stroke="#5eead4" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div class="load-brand">NORTHSTAR SECURITY TRAINING</div>
+      <h1>Ransomware Response: The First 60 Minutes</h1>
+      <p class="load-sub">You are Alice, an employee at Northstar Dynamics. An unexpected security incident is about to unfold.</p>
+      <div id="load-bar-track"><div id="load-bar-fill"></div></div>
+      <div id="load-status" role="status">Initializing&hellip;</div>
+    </div>
+
+    <noscript>
+      <div style="position:fixed;inset:0;z-index:999;background:#0b1524;color:#e2e8f0;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;">
+        <p style="max-width:520px;font-family:system-ui;line-height:1.6;">
+          <b style="letter-spacing:.15em;color:#5eead4;">RANSOMWARE RESPONSE</b><br><br>
+          This interactive training simulation requires JavaScript.<br>
+          Please enable JavaScript and reload the page.
+        </p>
+      </div>
+    </noscript>
+
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
