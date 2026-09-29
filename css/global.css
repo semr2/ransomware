@@ -40,7 +40,7 @@ button { font-family: inherit; }
 #app { position: fixed; inset: 0; }
 
 /* ---- 3D / 2D stage ---- */
-#scene-canvas { position: absolute; inset: 0; display: block; }
+#scene-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 #scene-2d { position: absolute; inset: 0; display: none; }
 html.mode-2d #scene-2d { display: block; }
 html.mode-2d #scene-canvas { display: none; }
@@ -55,6 +55,19 @@ html.mode-2d #scene-canvas { display: none; }
 #scene-2d .office-illus {
   position: absolute; left: 50%; bottom: 6%; transform: translateX(-50%);
   width: min(880px, 86vw);
+}
+#scene-2d .office-hotspot {
+  fill: transparent;
+  stroke: transparent;
+  pointer-events: all;
+  cursor: pointer;
+}
+#scene-2d .office-hotspot.active:hover,
+#scene-2d .office-hotspot.active:focus-visible {
+  fill: rgba(45, 212, 191, .14);
+  stroke: #5eead4;
+  stroke-width: 2;
+  outline: none;
 }
 #scene-2d .desk-line {
   height: 4px; border-radius: 2px; margin: 26px 8px;

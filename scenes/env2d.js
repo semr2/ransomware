@@ -60,6 +60,16 @@ const ILLUSTRATION = `
     <rect id="pc-screen" x="671" y="195" width="58" height="34" rx="2" fill="#0a1424"/>
   </g>
 
+  <!-- Transparent hit areas make the illustrated office directly interactive.
+       InteractionSystem gates each target to the objects needed by the step. -->
+  <g class="office-hotspots" aria-label="Interactive office objects">
+    <rect class="office-hotspot" data-object-id="monitor" x="340" y="150" width="195" height="102" rx="8" role="button" tabindex="0" aria-label="Workstation" />
+    <rect class="office-hotspot" data-object-id="phone" x="500" y="208" width="32" height="40" rx="6" role="button" tabindex="0" aria-label="Mobile phone" />
+    <rect class="office-hotspot" data-object-id="cable" x="536" y="238" width="28" height="72" rx="6" role="button" tabindex="0" aria-label="Network cable" />
+    <rect class="office-hotspot" data-object-id="power_button" x="470" y="218" width="66" height="32" rx="6" role="button" tabindex="0" aria-label="Power button" />
+    <rect class="office-hotspot" data-object-id="cleanpc" x="650" y="185" width="102" height="64" rx="8" role="button" tabindex="0" aria-label="Clean laptop" />
+  </g>
+
   <!-- chairs -->
   <g fill="#233042">
     <rect x="400" y="292" width="52" height="10" rx="4"/>
@@ -80,6 +90,16 @@ export class Env2D {
   init() {
     const host = document.getElementById('scene-2d');
     if (host) host.innerHTML = ILLUSTRATION;
+    host?.querySelectorAll('.office-hotspot').forEach((hotspot) => {
+      const activate = () => this.sys.activate(hotspot.dataset.objectId);
+      hotspot.addEventListener('click', activate);
+      hotspot.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          activate();
+        }
+      });
+    });
     this._els = {
       wsScreen: document.getElementById('ws-screen'),
       wsLabel: document.getElementById('ws-label'),

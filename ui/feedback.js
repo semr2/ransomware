@@ -16,7 +16,7 @@ export function clearOverlays() {
 export function panel({ title, body = '', choices = [], note = '', ariaLabel }) {
   const root = overlayRoot();
   const el = document.createElement('div');
-  el.className = 'ui-panel panel-fade-in';
+  el.className = 'ui-panel instruction-panel panel-fade-in';
   el.setAttribute('role', 'dialog');
   el.setAttribute('aria-modal', 'true');
   if (ariaLabel) el.setAttribute('aria-label', ariaLabel);

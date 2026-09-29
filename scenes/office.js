@@ -38,6 +38,7 @@ export class Env3D {
     this.onActivate = (id) => interactionSystem.activate(id);
     this.interactiveMeshes = [];
     this._hoverMesh = null;
+    this.interactionHighlights = {};
     this._camTween = null;
     this._shakeAmp = 0;
     this._ringing = false;
@@ -192,15 +193,97 @@ export class Env3D {
     return { group: g, frame, screen, canvas, texture };
   }
 
+  _keyboardUnit(x, z) {
+    const base = this._box(.49, .025, .17, M.plastic(), x, .78, z);
+    const keyMat = mat(0xcbd5e1, { rough: .55 });
+    const keyDark = mat(0x94a3b8, { rough: .6 });
+    for (let row = 0; row < 4; row++) {
+      const count = row === 3 ? 8 : 13;
+      const gap = .006;
+      const keyW = row === 3 ? .038 : .029;
+      const totalW = count * keyW + (count - 1) * gap;
+      for (let col = 0; col < count; col++) {
+        const key = new THREE.Mesh(
+          new THREE.BoxGeometry(keyW, .008, .024),
+          row === 0 && col === count - 1 ? keyDark : keyMat
+        );
+        key.position.set(x - totalW / 2 + col * (keyW + gap) + keyW / 2, .797, z - .058 + row * .034);
+        key.castShadow = true;
+        this.scene.add(key);
+      }
+    }
+    base.castShadow = true;
+    return base;
+  }
+
+  _mouseUnit(x, z) {
+    const shell = new THREE.Mesh(new THREE.SphereGeometry(.055, 18, 14), M.plasticL());
+    shell.position.set(x, .795, z);
+    shell.scale.set(.72, .27, 1.15);
+    shell.castShadow = true;
+    this.scene.add(shell);
+    const wheel = this._box(.012, .008, .025, M.plastic(), x, .81, z - .01, { cast: false });
+    return { shell, wheel };
+  }
+
+  _mugUnit(x, z) {
+    const ceramic = mat(0xe2e8f0, { rough: .28 });
+    const cup = new THREE.Mesh(new THREE.CylinderGeometry(.045, .038, .105, 20, 1, true), ceramic);
+    cup.position.set(x, .82, z);
+    cup.castShadow = true;
+    this.scene.add(cup);
+    const inside = new THREE.Mesh(new THREE.CircleGeometry(.038, 20), mat(0x3f3328, { rough: .3 }));
+    inside.rotation.x = -Math.PI / 2;
+    inside.position.set(x, .873, z);
+    this.scene.add(inside);
+    const handle = new THREE.Mesh(new THREE.TorusGeometry(.035, .009, 8, 18), ceramic);
+    handle.position.set(x + .05, .83, z);
+    handle.rotation.x = Math.PI / 2;
+    this.scene.add(handle);
+    return cup;
+  }
+
+  _paperStack(x, z) {
+    const sheetMat = mat(0xf1f5f9, { rough: .92 });
+    for (let i = 0; i < 3; i++) {
+      const sheet = this._box(.28, .006, .34, sheetMat, x, .78 + i * .008, z, { cast: false });
+      sheet.rotation.y = (i - 1) * .035;
+    }
+    const ink = mat(0x94a3b8, { rough: .9 });
+    for (let i = 0; i < 4; i++) {
+      this._box(.17 + (i % 2) * .04, .0015, .003, ink, x - .035, .805, z - .105 + i * .045, { cast: false, receive: false });
+    }
+  }
+
+  _deskPlant(x, z) {
+    const pot = new THREE.Mesh(new THREE.CylinderGeometry(.075, .06, .12, 16), mat(0x9a5f46, { rough: .82 }));
+    pot.position.set(x, .84, z);
+    pot.castShadow = true;
+    this.scene.add(pot);
+    for (let i = 0; i < 5; i++) {
+      const leaf = new THREE.Mesh(new THREE.SphereGeometry(.07, 12, 10), mat(i % 2 ? 0x43875a : 0x2f7049, { rough: .9 }));
+      const angle = (i / 5) * Math.PI * 2;
+      leaf.position.set(x + Math.cos(angle) * .055, .98 + (i % 2) * .035, z + Math.sin(angle) * .055);
+      leaf.scale.set(.42, 1.7, .5);
+      leaf.rotation.z = Math.cos(angle) * .35;
+      leaf.rotation.x = Math.sin(angle) * .35;
+      leaf.castShadow = true;
+      this.scene.add(leaf);
+    }
+  }
+
   _buildAliceStation() {
     this._deskUnit(-1.35, -3.1);
     this.chair = this._chairUnit(-1.25, -2.25, Math.PI);
 
     this.workstation = this._monitorUnit(-1.35, -3.32);
 
-    // Keyboard + mouse + docking station + phone.
-    this._box(.42, .02, .15, M.plasticL(), -1.42, .775, -2.86);
-    this._box(.07, .025, .11, M.plasticL(), -1.05, .775, -2.86);
+    // Keyboard, mouse, personal desk items, dock and phone.
+    this._keyboardUnit(-1.42, -2.86);
+    this._mouseUnit(-1.05, -2.86);
+    this._paperStack(-.9, -2.72);
+    this._mugUnit(-.62, -3.35);
+    this._deskPlant(-.48, -3.34);
     const dock = this._box(.34, .06, .22, M.plastic(), -2.0, .8, -3.05);
     this.dock = dock;
     const led = this._box(.03, .012, .03, new THREE.MeshBasicMaterial({ color: 0x2dd4bf }), -2.0, .833, -3.14, { cast: false, receive: false });
@@ -244,13 +327,38 @@ export class Env3D {
     // Power button on the dock (glows soft white).
     this.powerBtn = this._box(.05, .012, .05, new THREE.MeshBasicMaterial({ color: 0xf8fafc }), -1.92, .833, -3.05, { cast: false, receive: false });
 
-    // Register interactive targets (groups so any sub-mesh picks the object).
+    // Invisible, enlarged targets make the important desk objects practical to
+    // pick from the office camera, including on touch screens.
     this.interactMeshes = {
-      monitor: this.workstation.group,
-      phone: this.phone,
-      cable: this.cablePlugged,
-      power_button: this.powerBtn,
+      monitor: this._hitTarget('monitor', 1.45, .95, .42, -1.35, 1.2, -3.1),
+      phone: this._hitTarget('phone', .34, .22, .38, -.62, .84, -2.95),
+      cable: this._hitTarget('cable', .34, .86, .32, -2.12, .43, -2.72),
+      power_button: this._hitTarget('power_button', .26, .24, .26, -1.92, .86, -3.05),
     };
+  }
+
+  _hitTarget(id, w, h, d, x, y, z) {
+    const target = new THREE.Mesh(
+      new THREE.BoxGeometry(w, h, d),
+      new THREE.MeshBasicMaterial({
+        color: 0x2dd4bf, transparent: true, opacity: 0,
+        colorWrite: false,
+        depthWrite: false, side: THREE.DoubleSide,
+      })
+    );
+    target.position.set(x, y, z);
+    this.scene.add(target);
+
+    const outline = new THREE.LineSegments(
+      new THREE.EdgesGeometry(target.geometry),
+      new THREE.LineBasicMaterial({ color: 0x5eead4, transparent: true, opacity: .9 })
+    );
+    outline.position.copy(target.position);
+    outline.visible = false;
+    outline.userData.objectId = id;
+    this.scene.add(outline);
+    this.interactionHighlights[id] = outline;
+    return target;
   }
 
   _cable(curve) {
@@ -266,15 +374,45 @@ export class Env3D {
 
   _chairUnit(x, z, rot) {
     const g = new THREE.Group();
-    const seat = new THREE.Mesh(new THREE.BoxGeometry(.46, .06, .44), mat(0x233042, { rough: .7 }));
+    const upholstery = mat(0x33445a, { rough: .82 });
+    const seat = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 14), upholstery);
+    seat.scale.set(.26, .075, .24);
     seat.position.y = .48;
-    const back = new THREE.Mesh(new THREE.BoxGeometry(.44, .5, .06), mat(0x233042, { rough: .7 }));
-    back.position.set(0, .78, -.2);
+    const back = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 14), upholstery);
+    back.scale.set(.245, .31, .075);
+    back.position.set(0, .81, -.2);
+    const lumbar = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 12), mat(0x3c5068, { rough: .86 }));
+    lumbar.scale.set(.19, .105, .035);
+    lumbar.position.set(0, .76, -.125);
     const pole = new THREE.Mesh(new THREE.CylinderGeometry(.03, .03, .4, 10), M.deskLeg());
     pole.position.y = .26;
-    const base = new THREE.Mesh(new THREE.CylinderGeometry(.26, .28, .04, 5), M.plastic());
-    base.position.y = .03;
-    for (const p of [seat, back, pole, base]) { p.castShadow = true; g.add(p); }
+    const base = new THREE.Mesh(new THREE.CylinderGeometry(.045, .055, .045, 16), M.plastic());
+    base.position.y = .07;
+    for (const p of [seat, back, lumbar, pole, base]) { p.castShadow = true; g.add(p); }
+
+    // Five-star rolling base with small casters and padded arm rests.
+    for (let i = 0; i < 5; i++) {
+      const angle = (i / 5) * Math.PI * 2;
+      const dx = Math.cos(angle), dz = Math.sin(angle);
+      const spoke = new THREE.Mesh(new THREE.CylinderGeometry(.014, .019, .26, 8), M.plastic());
+      spoke.position.set(dx * .13, .055, dz * .13);
+      spoke.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(dx, 0, dz));
+      spoke.castShadow = true;
+      g.add(spoke);
+      const caster = new THREE.Mesh(new THREE.SphereGeometry(.045, 10, 8), M.plastic());
+      caster.scale.set(1.25, .62, .85);
+      caster.position.set(dx * .27, .04, dz * .27);
+      caster.castShadow = true;
+      g.add(caster);
+    }
+    for (const side of [-1, 1]) {
+      const post = new THREE.Mesh(new THREE.CylinderGeometry(.014, .018, .2, 8), M.deskLeg());
+      post.position.set(side * .22, .63, -.02);
+      const armrest = new THREE.Mesh(new THREE.SphereGeometry(1, 14, 10), mat(0x46566a, { rough: .72 }));
+      armrest.scale.set(.12, .035, .16);
+      armrest.position.set(side * .22, .74, -.04);
+      g.add(post, armrest);
+    }
     g.position.set(x, 0, z);
     g.rotation.y = rot;
     this.scene.add(g);
@@ -305,16 +443,19 @@ export class Env3D {
     base.castShadow = lid.castShadow = true;
     g.add(base, lid, screen);
     this.scene.add(g);
+    this._keyboardUnit(1.9, -2.83);
+    this._box(.09, .012, .12, M.plasticL(), 2.22, .79, -2.83, { cast: false });
     this.laptop = { group: g, canvas, texture, mesh: lid };
-    this.interactMeshes.cleanpc = g;
+    this.interactMeshes.cleanpc = this._hitTarget('cleanpc', .9, .72, .58, 1.9, .98, -3.02);
   }
 
   _buildBackground() {
-    // Two rows of non-interactive desks with dark monitors.
+    // Two rows of non-interactive desks with active NOVA workspace screens.
     for (const [x, z, rot] of [[-4.4, -0.6, 0], [-1.6, -0.6, 0], [1.6, -0.6, 0], [4.4, -0.6, 0],
                                [-3.2, 1.8, Math.PI], [0, 1.8, Math.PI], [3.2, 1.8, Math.PI]]) {
       this._deskUnit(x, z, 1.7, .75);
-      this._monitorUnit(x, z - 0.18, .5);
+      const monitor = this._monitorUnit(x, z - 0.18, .5);
+      this._paintCanvas(monitor, 'office', false);
       this._chairUnit(x, z + (rot === 0 ? .8 : -.8), rot);
     }
     // Plants.
@@ -402,7 +543,7 @@ export class Env3D {
       this.dockLed.material.color.set(st === 'unplugged' ? 0xf59e0b : 0x2dd4bf);
     }
     if (id === 'cleanpc') {
-      this._paintCanvas(this.laptop, st === 'login' ? 'login' : st === 'clean' ? 'desktop' : 'off', true);
+      this._paintCanvas(this.laptop, st === 'login' ? 'login' : st === 'clean' ? 'clean' : 'off', true);
     }
   }
 
@@ -454,7 +595,47 @@ export class Env3D {
     ctx.fillStyle = '#94a3b8';
     ctx.fillText('Secure Desktop', 19, H * .22 + W / 24);
 
-    if (state === 'login') {
+    if (state === 'desktop' && !isLaptop) {
+      // A bright, fictional status terminal makes Alice's workstation feel
+      // active without showing a real OS shell or executing real commands.
+      const x = W * .12, y = H * .31, w = W * .76, h = H * .57;
+      ctx.fillStyle = '#e8f0f6';
+      ctx.beginPath();
+      ctx.roundRect(x, y, w, h, 9);
+      ctx.fill();
+      ctx.fillStyle = '#0f766e';
+      ctx.beginPath();
+      ctx.roundRect(x, y, w, H * .11, [9, 9, 0, 0]);
+      ctx.fill();
+      ctx.fillStyle = '#f0fdfa';
+      ctx.font = `700 ${W / 36}px system-ui`;
+      ctx.fillText('NOVA  /  SECURE TERMINAL', x + 12, y + H * .075);
+      ctx.font = `600 ${W / 42}px ui-monospace, monospace`;
+      ctx.fillStyle = '#334155';
+      ctx.textAlign = 'left';
+      ctx.fillText('Session: alice.chen  ·  Workstation ready', x + 14, y + H * .21);
+      ctx.fillStyle = '#0f766e';
+      ctx.fillText('Security services active', x + 14, y + H * .31);
+      ctx.fillText('Workspace: Northstar Operations', x + 14, y + H * .41);
+      ctx.fillStyle = '#64748b';
+      ctx.fillText('Waiting for your next action  ▌', x + 14, y + H * .51);
+    } else if (state === 'office') {
+      // Background colleagues have active, luminous workspaces too.
+      this._miniWindow(ctx, W, H, '#f8fafc');
+      ctx.fillStyle = '#0f766e';
+      ctx.fillRect(W * .12, H * .24, W * .76, H * .10);
+      ctx.fillStyle = '#f0fdfa';
+      ctx.font = `700 ${W / 32}px system-ui`;
+      ctx.textAlign = 'left';
+      ctx.fillText('NOVA WORKSPACE', W * .16, H * .31);
+      ctx.fillStyle = '#14b8a6';
+      ctx.beginPath(); ctx.arc(W * .2, H * .49, W * .025, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#334155';
+      ctx.font = `600 ${W / 38}px system-ui`;
+      ctx.fillText('Team services ready', W * .25, H * .51);
+      ctx.fillStyle = '#cbd5e1';
+      for (let i = 0; i < 3; i++) ctx.fillRect(W * .2, H * (.62 + i * .07), W * (.42 + (i % 2) * .12), H * .018);
+    } else if (state === 'login') {
       ctx.fillStyle = '#cbd5e1';
       ctx.beginPath(); ctx.arc(W / 2, H * .38, W * .07, 0, 7); ctx.fill();
       ctx.fillStyle = '#0f172a';
@@ -507,7 +688,7 @@ export class Env3D {
 
   _paintScreens() {
     this.paintMonitor('desktop');
-    this.setObjectState('cleanpc', 'off');
+    this.setObjectState('cleanpc', 'clean');
   }
 
   /* ---- pointer interaction ---- */
@@ -517,6 +698,7 @@ export class Env3D {
     this.pointer = new THREE.Vector2();
     this.canvas.addEventListener('pointermove', (e) => this._onPointerMove(e));
     this.canvas.addEventListener('click', (e) => this._onClick(e));
+    this.canvas.addEventListener('pointerleave', () => this._clearHover());
   }
 
   _activeMeshList() {
@@ -546,12 +728,24 @@ export class Env3D {
     const id = this._pick(e);
     this.canvas.style.cursor = id ? 'pointer' : 'default';
     if (id) {
+      if (this._hoverMesh && this.interactionHighlights[this._hoverMesh]) {
+        this.interactionHighlights[this._hoverMesh].visible = false;
+      }
+      if (this.interactionHighlights[id]) this.interactionHighlights[id].visible = true;
       this.sys.showHoverLabel(id);
       this._hoverMesh = id;
     } else {
-      this.sys.hideHoverLabel();
-      this._hoverMesh = null;
+      this._clearHover();
     }
+  }
+
+  _clearHover() {
+    if (this._hoverMesh && this.interactionHighlights[this._hoverMesh]) {
+      this.interactionHighlights[this._hoverMesh].visible = false;
+    }
+    this.canvas.style.cursor = 'default';
+    this.sys.hideHoverLabel();
+    this._hoverMesh = null;
   }
 
   _onClick(e) {

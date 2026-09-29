@@ -29,6 +29,10 @@ html.reduced-motion .btn { transition: none; }
   box-shadow: var(--shadow-lg);
   padding: 26px 30px;
 }
+.instruction-panel { left: calc(50% + min(110px, 7vw)); }
+@media (max-width: 820px) {
+  .instruction-panel { left: 50%; }
+}
 .ui-panel h2 { font-size: 21px; margin-bottom: 10px; color: #fff; }
 .ui-panel p  { font-size: 14.5px; line-height: 1.6; color: #cbd5e1; }
 .ui-panel .choice-stack { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
@@ -105,6 +109,38 @@ html.reduced-motion #hint-chip.visible { animation: none; }
 .phone-screen .caller-id { text-align: center; font-size: 12px; color: var(--ink-400); }
 .phone-screen .caller-name { text-align: center; font-size: 22px; font-weight: 700; color: #fff; }
 .phone-screen .call-status { text-align: center; font-size: 12px; color: var(--green-600); }
+.incoming-call-alert {
+  display: flex; align-items: center; justify-content: center; gap: 9px;
+  color: #fca5a5; font-size: 11px; font-weight: 800; letter-spacing: .2em;
+}
+.incoming-call-alert[hidden] { display: none; }
+.ring-icon { display: inline-block; font-size: 20px; animation: phoneRing .55s ease-in-out infinite alternate; }
+.incoming-call-alert::after {
+  content: ""; width: 7px; height: 7px; border-radius: 50%; background: #f87171;
+  box-shadow: 0 0 12px rgba(248,113,113,.9); animation: ringDot .8s ease-in-out infinite;
+}
+@keyframes phoneRing { from { transform: rotate(-16deg); } to { transform: rotate(16deg); } }
+@keyframes ringDot { 50% { opacity: .25; } }
+.answer-slider-wrap { display: grid; gap: 6px; padding: 10px 11px 8px; border: 1px solid rgba(45,212,191,.28); border-radius: 13px; background: rgba(45,212,191,.07); }
+.answer-slider-label { text-align: center; color: #99f6e4; font-size: 10px; font-weight: 800; letter-spacing: .16em; }
+.phone-answer-slider {
+  --slide-progress: 0%; appearance: none; width: 100%; height: 42px; margin: 0;
+  border-radius: 999px; border: 1px solid rgba(148,163,184,.3);
+  background: linear-gradient(90deg, rgba(45,212,191,.35) var(--slide-progress), rgba(15,23,42,.9) var(--slide-progress));
+  cursor: grab; touch-action: pan-y;
+}
+.phone-answer-slider:active { cursor: grabbing; }
+.phone-answer-slider::-webkit-slider-thumb {
+  appearance: none; width: 38px; height: 38px; border-radius: 50%;
+  border: 2px solid #99f6e4; background: linear-gradient(180deg,#2dd4bf,#0f766e);
+  box-shadow: 0 0 16px rgba(45,212,191,.45);
+}
+.phone-answer-slider::-moz-range-thumb {
+  width: 34px; height: 34px; border-radius: 50%; border: 2px solid #99f6e4;
+  background: linear-gradient(180deg,#2dd4bf,#0f766e); box-shadow: 0 0 16px rgba(45,212,191,.45);
+}
+.answer-slider-hint { text-align: center; color: #94a3b8; font-size: 10.5px; }
+html.reduced-motion .ring-icon, html.reduced-motion .incoming-call-alert::after { animation: none; }
 .phone-screen .call-script {
   flex: 1; font-size: 14px; line-height: 1.6; color: #cbd5e1;
   background: rgba(148, 163, 184, .07); border-radius: 14px; padding: 14px;
@@ -151,6 +187,7 @@ html.reduced-motion .obj-focus-ring { transition: none; }
   display: none; flex-direction: column; gap: 8px; max-width: 300px;
 }
 html.mode-2d #objects-2d { display: flex; }
+html:not(.mode-2d) #objects-2d.has-active { display: flex; }
 .object-btn-2d {
   display: flex; align-items: center; gap: 10px; text-align: left;
   background: rgba(16, 29, 51, .92); color: var(--paper-100);
