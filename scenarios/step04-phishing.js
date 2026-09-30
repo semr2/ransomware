@@ -15,6 +15,10 @@ export const step = {
         label: 'OPEN SECURITY_UPDATE.EXE',
         kind: 'btn-danger',
         onClick: () => choose('open'),
+      }, {
+        label: 'REPORT & KEEP EMAIL',
+        kind: 'btn-primary',
+        onClick: () => choose('flag'),
       }],
       inspectMode: true,
     });
@@ -23,7 +27,10 @@ export const step = {
     // Dock re-openings (or clicking another mail then back) keep the hotspots live.
     ctx.mailApp.onAppOpen = () => ctx.mailApp.openMail(PHISH_MAIL, {
       hotspots: ['sender', 'urgency', 'greeting', 'attachment'],
-      attachmentActions: [{ label: 'OPEN SECURITY_UPDATE.EXE', kind: 'btn-danger', onClick: () => choose('open') }],
+      attachmentActions: [
+        { label: 'OPEN SECURITY_UPDATE.EXE', kind: 'btn-danger', onClick: () => choose('open') },
+        { label: 'REPORT & KEEP EMAIL', kind: 'btn-primary', onClick: () => choose('flag') },
+      ],
     });
     ctx.mailApp.onHotspot = (key) => {
       const id = { sender: 'sender_inspection', urgency: 'urgency_inspection', attachment: 'attachment_inspection' }[key];
@@ -60,13 +67,10 @@ export const step = {
       title: 'The caller is still waiting',
       body: `
         <p>\u201CHave you installed the update yet? Your account is at risk.\u201D</p>
-        <p style="margin-top:10px">Inspect the highlighted indicators in the email first —
-        then decide what to do with the attachment.</p>`,
-      choices: [
-        { label: 'OPEN THE ATTACHMENT AS INSTRUCTED', kind: 'btn-danger', onClick: () => choose('open') },
-        { label: 'STOP — REPORT IT, KEEP THE EMAIL', kind: 'btn-primary', onClick: () => choose('flag') },
-      ],
-      note: 'Inspecting hotspots is encouraged but not required to continue.',
+        <p style="margin-top:10px">Inspect the highlighted indicators, then use the email itself:
+        click <b style="color:#fff">Security_Update.exe</b> to open it, or choose the report option
+        beside the attachment.</p>`,
+      note: 'This prompt is guidance only. Make your choice in the email window.',
       ariaLabel: 'The caller is waiting. Inspect the email, then decide about the attachment.',
     });
   },

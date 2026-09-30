@@ -43,10 +43,12 @@ export class InteractionSystem {
   _render() {
     this.panel?.classList.toggle('has-active', this.activeIds.length > 0);
     document.querySelectorAll('#scene-2d .office-hotspot').forEach((hotspot) => {
+      const item = this.catalog.find((entry) => entry.id === hotspot.dataset.objectId);
       const active = this.activeIds.includes(hotspot.dataset.objectId);
       hotspot.classList.toggle('active', active);
       hotspot.setAttribute('tabindex', active ? '0' : '-1');
       hotspot.setAttribute('aria-disabled', String(!active));
+      if (item) hotspot.setAttribute('aria-label', `${item.label}. ${item.description || ''}`);
     });
     if (!this.panel) return;
     this.panel.replaceChildren();

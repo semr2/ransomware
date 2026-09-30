@@ -42,6 +42,11 @@ class Desktop {
     this.stage.classList.add('visible');
     if (deviceLabel) {
       this.deviceChip.textContent = deviceLabel;
+      const os = /clean laptop/i.test(deviceLabel) ? 'LINUX' : 'WINDOWS 11';
+      this.osChip.textContent = os;
+      this.osChip.setAttribute('aria-label', `${os} training simulation`);
+      this.frame.dataset.os = os.toLowerCase().replaceAll(' ', '-');
+      this.dockEl.setAttribute('aria-label', `${os} desktop applications`);
     }
   }
 
@@ -56,7 +61,7 @@ class Desktop {
     frame.className = 'nova-frame';
     frame.innerHTML = `
       <div class="nova-topbar">
-        <span class="nova-logo">NOVA</span>
+        <span class="nova-logo" id="nova-os">WINDOWS 11</span>
         <span class="nova-chip" id="nova-device">Workstation</span>
         <span class="nova-chip" id="nova-user">alice.chen</span>
         <span class="grow"></span>
@@ -70,6 +75,7 @@ class Desktop {
     this.stage.replaceChildren(frame);
     this.frame = frame;
     this.deviceChip = frame.querySelector('#nova-device');
+    this.osChip = frame.querySelector('#nova-os');
     this.statusChip = frame.querySelector('#nova-status');
     this.desktopEl = frame.querySelector('#nova-desktop');
     this.dockEl = frame.querySelector('.nova-dock');

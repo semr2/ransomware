@@ -145,7 +145,7 @@ function boot() {
   engine.sys.setCatalog([
     { id: 'monitor', label: 'Workstation', description: 'Alice\u2019s primary workstation computer.' },
     { id: 'phone', label: 'Mobile Phone', description: 'Alice\u2019s mobile phone on the desk.' },
-    { id: 'cable', label: 'Network Cable', description: 'Ethernet cable linking the workstation to the office network.' },
+    { id: 'cable', label: 'Network Cable', description: 'Click the highlighted cable to disconnect the infected workstation from the network.' },
     { id: 'power_button', label: 'Power Button', description: 'Power control on the workstation dock.' },
     { id: 'cleanpc', label: 'Clean Laptop', description: 'A known-clean laptop at the spare desk.' },
   ]);

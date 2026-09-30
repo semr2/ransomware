@@ -10,26 +10,68 @@ const overlayRoot = () => document.getElementById('overlay-root');
 
 export function clearOverlays() {
   overlayRoot()?.replaceChildren();
+  document.getElementById('interaction-root')?.replaceChildren();
 }
 
 /** Generic choice/info panel. Returns a close() function. */
-export function panel({ title, body = '', choices = [], note = '', ariaLabel }) {
+export function panel({ title, body = '', choices = [], note = '', ariaLabel, className = '', collapsible = false }) {
   const root = overlayRoot();
+  const interactionRoot = document.getElementById('interaction-root');
+  const splitChoices = collapsible && choices.length > 0 && interactionRoot;
   const el = document.createElement('div');
-  el.className = 'ui-panel instruction-panel panel-fade-in';
+  el.className = `ui-panel instruction-panel panel-fade-in ${collapsible ? 'compact-panel' : ''} ${className}`.trim();
   el.setAttribute('role', 'dialog');
-  el.setAttribute('aria-modal', 'true');
+  el.setAttribute('aria-modal', String(!collapsible));
   if (ariaLabel) el.setAttribute('aria-label', ariaLabel);
-  const h = document.createElement('h2');
-  h.textContent = title;
-  el.appendChild(h);
+  if (collapsible) {
+    const toggle = document.createElement('button');
+    toggle.className = 'instruction-toggle';
+    toggle.type = 'button';
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.textContent = `ⓘ ${title}`;
+    toggle.addEventListener('click', () => {
+      const expanded = el.classList.toggle('pinned');
+      toggle.setAttribute('aria-expanded', String(expanded || el.classList.contains('hovered')));
+    });
+    const reveal = () => {
+      el.classList.add('hovered');
+      toggle.setAttribute('aria-expanded', 'true');
+    };
+    const conceal = () => {
+      if (el.contains(document.activeElement) || el.matches(':hover')) return;
+      el.classList.remove('hovered');
+      toggle.setAttribute('aria-expanded', String(el.classList.contains('pinned')));
+    };
+    el.addEventListener('pointerenter', reveal);
+    el.addEventListener('pointerleave', conceal);
+    el.addEventListener('focusin', reveal);
+    el.addEventListener('focusout', (event) => {
+      if (!el.contains(event.relatedTarget)) conceal();
+    });
+    el.appendChild(toggle);
+  } else {
+    const h = document.createElement('h2');
+    h.textContent = title;
+    el.appendChild(h);
+  }
   if (body) {
-    const p = document.createElement('p');
-    p.innerHTML = body; // trusted, course-authored content only
-    el.appendChild(p);
+    const content = document.createElement('div');
+    content.className = 'panel-body';
+    content.innerHTML = body; // trusted, course-authored content only
+    el.appendChild(content);
   }
   const stack = document.createElement('div');
   stack.className = 'choice-stack';
+  let actionPanel = null;
+  if (splitChoices) {
+    actionPanel = document.createElement('section');
+    actionPanel.className = 'ui-panel action-panel panel-fade-in';
+    actionPanel.setAttribute('role', 'group');
+    actionPanel.setAttribute('aria-label', 'Choose an action');
+    const heading = document.createElement('h2');
+    heading.textContent = 'Choose an action';
+    actionPanel.appendChild(heading);
+  }
   for (const c of choices) {
     const b = document.createElement('button');
     b.className = `btn ${c.kind || 'btn-secondary'}`;
@@ -41,7 +83,10 @@ export function panel({ title, body = '', choices = [], note = '', ariaLabel }) 
     });
     stack.appendChild(b);
   }
-  if (choices.length) el.appendChild(stack);
+  if (choices.length) {
+    if (splitChoices) actionPanel.appendChild(stack);
+    else el.appendChild(stack);
+  }
   if (note) {
     const n = document.createElement('p');
     n.className = 'small-note';
@@ -49,12 +94,13 @@ export function panel({ title, body = '', choices = [], note = '', ariaLabel }) 
     el.appendChild(n);
   }
   root.appendChild(el);
-  a11y.trapFocus(el);
+  if (actionPanel) interactionRoot.appendChild(actionPanel);
+  if (!collapsible) a11y.trapFocus(el);
   const first = el.querySelector('button');
   if (first) a11y.focus(first);
   a11y.announce(`${title}. ${typeof body === 'string' ? body.replace(/<[^>]+>/g, '') : ''}`);
 
-  function close() { el.remove(); }
+  function close() { el.remove(); actionPanel?.remove(); }
   return close;
 }
 

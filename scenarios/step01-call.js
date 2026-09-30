@@ -1,5 +1,5 @@
 /** Step 1 — Unknown Call: the phone rings; answering is not the mistake. */
-import { incomingCall, hidePhone } from '../ui/phone.js';
+import { incomingCall, hidePhone, focusIncomingSlider } from '../ui/phone.js';
 
 export const step = {
   id: 'step01',
@@ -7,7 +7,9 @@ export const step = {
   objective: 'Decide how to handle an unexpected call.',
   hint: 'Answering a call is not a mistake — but stay alert for pressure tactics.',
   enter(ctx) {
-    ctx.env.setView('office');
+    // Bring the physical desk phone into close view while it rings. The call
+    // prompt supplies the accessible slide-to-answer interaction.
+    ctx.env.setView('phone');
     ctx.env.ringPhone(true);
     ctx.audio.ring(true);
     ctx.a11y.caption('A mobile phone is ringing on the desk.');
@@ -45,7 +47,7 @@ export const step = {
       });
     };
 
-    ctx.sys.onActivate = () => answer(); // clicking the phone in the scene also answers
+    ctx.sys.onActivate = () => focusIncomingSlider(); // interact with the desk phone, then slide to answer
     ctx.sys.setActive(['phone']);
     incomingCall({ onAnswer: answer, onIgnore: ignore });
   },

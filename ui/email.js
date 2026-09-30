@@ -161,10 +161,16 @@ class MailApp {
       const card = document.createElement('div');
       card.className = 'attachment-card';
       card.innerHTML = `
-        <div class="file-ico">EXE</div>
-        <div><div class="file-name"></div><div class="file-size"></div></div>`;
-      card.querySelector('.file-name').textContent = m.attachment.name;
-      card.querySelector('.file-size').textContent = m.attachment.size;
+        <button type="button" class="attachment-open" aria-label="Open attached file"></button>`;
+      const openTarget = card.querySelector('.attachment-open');
+      openTarget.setAttribute('aria-label', `Open ${m.attachment.name}`);
+      openTarget.innerHTML = '<span class="file-ico">EXE</span><span><span class="file-name"></span><span class="file-size"></span></span>';
+      openTarget.querySelector('.file-name').textContent = m.attachment.name;
+      openTarget.querySelector('.file-size').textContent = m.attachment.size;
+      openTarget.addEventListener('click', () => {
+        audio.click();
+        attachmentActions[0]?.onClick?.();
+      });
       if (hotspots.includes('attachment')) {
         const tag = this._hotspotSpan('attachment', '⚠ inspect');
         card.appendChild(tag);
@@ -173,7 +179,7 @@ class MailApp {
       actions.style.marginLeft = 'auto';
       actions.style.display = 'flex';
       actions.style.gap = '8px';
-      for (const a of attachmentActions) {
+      for (const a of attachmentActions.slice(1)) {
         const b = document.createElement('button');
         b.className = `btn ${a.kind || 'btn-secondary'}`;
         b.style.minHeight = '36px';

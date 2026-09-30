@@ -31,21 +31,18 @@ export const step = {
           From: ${PHISH_MAIL.from} &lt;${PHISH_MAIL.address}&gt;</p>
         <p style="margin-top:10px">Northstar\u2019s real domain is
           <b style="color:#4ade80;font-family:var(--mono)">northstar-training.test</b><br>
-          Click the part of the sender\u2019s address that does not belong.</p>
-        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;font-family:var(--mono)">
-          ${SEGMENTS.map((s, i) =>
-            `<button type="button" data-seg="${i}" aria-label="Inspect this part of the sender address: ${s.text}"
-               class="btn btn-ghost" style="min-height:40px;padding:6px 10px;font-size:13.5px;font-family:inherit">${s.text}</button>`
-          ).join('')}
-        </div>`,
+          Compare it with the sender address shown in the email.</p>`,
+      choices: SEGMENTS.map((segment) => ({
+        label: segment.text,
+        kind: 'btn-ghost',
+        keepOpen: true,
+        onClick: () => inspectSegment(segment),
+      })),
       ariaLabel: 'Which part of the sender address is suspicious? The real domain is northstar hyphen training dot test.',
     });
 
-    document.querySelectorAll('.ui-panel [data-seg]').forEach((btn) => {
-      const seg = SEGMENTS[Number(btn.dataset.seg)];
-      btn.addEventListener('click', () => {
+    function inspectSegment(seg) {
         if (settled) return;
-        ctx.audio.click();
         if (seg.key === 'lookalike') {
           settled = true;
           const earned = wrongTries === 0 ? 10 : 5;
@@ -68,11 +65,9 @@ export const step = {
           });
         } else {
           wrongTries++;
-          btn.style.borderColor = 'rgba(248,113,113,.5)';
           ctx.scorm.recordInteraction('sender_check_attempt', `wrong_segment:${seg.key}`, 'wrong');
           ctx.toast('Not that part — compare it with the real domain, character by character.');
         }
-      });
-    });
+    }
   },
 };

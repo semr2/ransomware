@@ -40,7 +40,8 @@ class ScenarioEngine {
       state, scorm, a11y, audio,
       env: this.env,
       desktop, mailApp, fileManager, ransomScreen, loginScreen, ticketing,
-      panel, feedback, toast,
+      panel: (options) => panel({ ...options, collapsible: options.collapsible ?? true }),
+      feedback, toast,
       sys: this.sys,
     };
   }
@@ -60,6 +61,7 @@ class ScenarioEngine {
   enter() {
     const step = this.steps[this.currentStep];
     clearOverlays();
+    document.getElementById('screen-stage')?.classList.remove('report-layout');
     this._hideHint();
     this.sys.setActive([]);
     this.updateHeader();
@@ -96,6 +98,7 @@ class ScenarioEngine {
    */
   decision({ id, choice, earned = 0, max = 0, result = 'neutral', verdict = 'good',
              title, why, response, onContinue, continueLabel }) {
+    clearOverlays();
     state.recordDecision(id, choice, earned, max);
     scorm.recordInteraction(id, response ?? choice, result);
     feedback({ verdict, title, why, onContinue, continueLabel });

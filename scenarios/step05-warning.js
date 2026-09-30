@@ -63,7 +63,7 @@ export const step = {
       ctx.fileManager.renderFolder('downloads');
       ctx.desktop.openApp('files');
       ctx.fileManager.onDangerousFile = () => { ctx.fileManager.onDangerousFile = null; showWarning(); };
-      ctx.toast('Open the Downloads folder and inspect the downloaded file.');
+      ctx.toast('Download complete. Select Security_Update.exe in Downloads to open it.');
     }
 
     function bridgeToWarningFromFlag() {

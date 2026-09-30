@@ -27,53 +27,57 @@ function buildPhone() {
 export function incomingCall({ onAnswer, onIgnore }) {
   const host = layer();
   host.replaceChildren();
-  const device = buildPhone();
-  device.classList.add('ringing');
-  device.querySelector('.caller-id').textContent = 'UNKNOWN CALLER';
-  device.querySelector('.caller-name').textContent = 'Unknown';
-  device.querySelector('.call-status').textContent = 'Incoming call…';
-  device.querySelector('.incoming-call-alert').hidden = false;
-  device.querySelector('.call-script').textContent =
-    'Your mobile is ringing. The number is not recognized.';
-  const actions = device.querySelector('.phone-actions');
-  let answered = false;
-  const answer = () => {
-    if (answered) return;
-    answered = true;
-    onAnswer();
-  };
-
-  const slideWrap = document.createElement('div');
-  slideWrap.className = 'answer-slider-wrap';
-  const slideLabel = document.createElement('label');
-  slideLabel.className = 'answer-slider-label';
-  slideLabel.htmlFor = 'phone-answer-slider';
-  slideLabel.textContent = 'SLIDE TO ANSWER';
+  host.classList.add('incoming-call-layer');
+  const widget = document.createElement('section');
+  widget.className = 'incoming-call-widget';
+  widget.setAttribute('aria-label', 'Incoming call instructions');
+  const toggle = document.createElement('button');
+  toggle.type = 'button';
+  toggle.className = 'incoming-call-toggle';
+  toggle.setAttribute('aria-expanded', 'false');
+  toggle.innerHTML = '<span class="ring-icon" aria-hidden="true">☎</span><span>PHONE RINGING · UNKNOWN CALLER</span><span class="toggle-caret" aria-hidden="true">⌄</span>';
+  const details = document.createElement('div');
+  details.className = 'incoming-call-details';
+  const instruction = document.createElement('p');
+  instruction.textContent = 'Alice’s mobile phone is ringing on the desk. Slide to answer, or let the call go to voicemail.';
+  const sliderWrap = document.createElement('div');
+  sliderWrap.className = 'answer-slider-wrap';
+  const sliderLabel = document.createElement('label');
+  sliderLabel.className = 'answer-slider-label';
+  sliderLabel.htmlFor = 'desk-phone-answer-slider';
+  sliderLabel.textContent = 'SLIDE TO ANSWER';
   const slider = document.createElement('input');
   slider.type = 'range';
-  slider.id = 'phone-answer-slider';
+  slider.id = 'desk-phone-answer-slider';
   slider.className = 'phone-answer-slider';
   slider.min = '0';
   slider.max = '100';
   slider.value = '0';
   slider.setAttribute('aria-label', 'Slide to answer the incoming call');
   slider.setAttribute('aria-valuetext', 'Not answered');
-  const slideHint = document.createElement('span');
-  slideHint.className = 'answer-slider-hint';
-  slideHint.textContent = 'Drag to the end, or use the arrow keys';
+  const sliderHint = document.createElement('span');
+  sliderHint.className = 'answer-slider-hint';
+  sliderHint.textContent = 'Drag to the end, or use the arrow keys';
   slider.addEventListener('input', () => {
     const progress = Number(slider.value);
     slider.style.setProperty('--slide-progress', `${progress}%`);
     slider.setAttribute('aria-valuetext', progress >= 90 ? 'Answering call' : `${progress}%`);
-    slideHint.textContent = progress >= 70 ? 'Keep sliding to answer' : 'Drag to the end, or use the arrow keys';
+    sliderHint.textContent = progress >= 70 ? 'Keep sliding to answer' : 'Drag to the end, or use the arrow keys';
     if (progress >= 90) {
       audio.click();
       answer();
     }
   });
-  slideWrap.append(slideLabel, slider, slideHint);
-  device.querySelector('.phone-screen').insertBefore(slideWrap, actions);
-
+  sliderWrap.append(sliderLabel, slider, sliderHint);
+  const actions = document.createElement('div');
+  actions.className = 'phone-actions';
+  details.append(instruction, sliderWrap, actions);
+  let answered = false;
+  const answer = () => {
+    if (answered) return;
+    answered = true;
+    onAnswer();
+  };
   const mk = (label, cls, fn) => {
     const b = document.createElement('button');
     b.className = `btn ${cls}`;
@@ -81,20 +85,49 @@ export function incomingCall({ onAnswer, onIgnore }) {
     b.addEventListener('click', () => { audio.click(); fn(); });
     actions.appendChild(b);
   };
-  mk('ANSWER', 'btn-primary', answer);
-  mk('IGNORE', 'btn-secondary', onIgnore);
-  host.appendChild(device);
+  mk('LET IT GO TO VOICEMAIL', 'btn-secondary', onIgnore);
+  toggle.addEventListener('click', () => {
+    const pinned = widget.classList.toggle('pinned');
+    toggle.setAttribute('aria-expanded', String(pinned || widget.classList.contains('hovered')));
+  });
+  const reveal = () => {
+    widget.classList.add('hovered');
+    toggle.setAttribute('aria-expanded', 'true');
+  };
+  const conceal = () => {
+    if (widget.contains(document.activeElement) || widget.matches(':hover')) return;
+    widget.classList.remove('hovered');
+    toggle.setAttribute('aria-expanded', String(widget.classList.contains('pinned')));
+  };
+  widget.addEventListener('pointerenter', reveal);
+  widget.addEventListener('pointerleave', conceal);
+  widget.addEventListener('focusin', reveal);
+  widget.addEventListener('focusout', conceal);
+  widget.append(toggle, details);
+  host.appendChild(widget);
   host.classList.add('visible');
-  a11y.announce('Incoming call from unknown caller. Slide to answer, or choose the Answer or Ignore button.');
-  a11y.focus(slider);
+  a11y.announce('Alice’s mobile phone on the desk is ringing. Open the phone prompt, then slide to answer or let the call go to voicemail.');
+  a11y.focus(toggle);
 
   return () => { host.classList.remove('visible'); host.replaceChildren(); };
+}
+
+/** Opens the call controls and focuses the slide interaction when the desk phone is activated. */
+export function focusIncomingSlider() {
+  const widget = layer()?.querySelector('.incoming-call-widget');
+  const toggle = widget?.querySelector('.incoming-call-toggle');
+  const slider = widget?.querySelector('.phone-answer-slider');
+  if (!widget || !toggle || !slider) return;
+  widget.classList.add('pinned');
+  toggle.setAttribute('aria-expanded', 'true');
+  a11y.focus(slider);
 }
 
 /** Live call: script lines appear first, then choices. */
 export function callConversation({ lines, choices, statusText = 'Connected — 0:12' }) {
   const host = layer();
   host.replaceChildren();
+  host.classList.remove('incoming-call-layer');
   const device = buildPhone();
   device.querySelector('.caller-id').textContent = 'UNKNOWN CALLER';
   device.querySelector('.caller-name').textContent = '“IT Support”';
@@ -137,6 +170,7 @@ export function callConversation({ lines, choices, statusText = 'Connected — 0
 export function voicemail({ lines, onContinue }) {
   const host = layer();
   host.replaceChildren();
+  host.classList.remove('incoming-call-layer');
   const device = buildPhone();
   device.querySelector('.caller-id').textContent = 'VOICEMAIL · 0:31';
   device.querySelector('.caller-name').textContent = 'Unknown';
@@ -163,5 +197,6 @@ export function voicemail({ lines, onContinue }) {
 export function hidePhone() {
   const host = layer();
   host.classList.remove('visible');
+  host.classList.remove('incoming-call-layer');
   host.replaceChildren();
 }

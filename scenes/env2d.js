@@ -41,11 +41,16 @@ const ILLUSTRATION = `
     <rect x="542" y="242" width="10" height="60" fill="#3c4658"/>
     <rect x="352" y="160" width="120" height="74" rx="6" fill="#111827"/>
     <rect id="ws-screen" x="356" y="164" width="112" height="62" rx="3" fill="#123a44"/>
-    <text id="ws-label" x="412" y="200" fill="#2dd4bf" font-family="system-ui" font-size="13" font-weight="800" text-anchor="middle">NOVA</text>
+    <text id="ws-label" x="412" y="200" fill="#60a5fa" font-family="system-ui" font-size="12" font-weight="800" text-anchor="middle">WINDOWS 11</text>
     <rect x="480" y="224" width="46" height="8" rx="3" fill="#2b3444"/>
     <rect x="352" y="236" width="60" height="14" rx="3" fill="#d7dce5"/>
     <rect x="426" y="238" width="12" height="10" rx="4" fill="#d7dce5"/>
     <rect id="ws-phone" x="508" y="214" width="16" height="26" rx="4" fill="#2b3444"/>
+    <g id="ws-phone-alert" display="none" aria-hidden="true">
+      <path d="M527 215q7 6 0 12M530 212q11 9 0 18" fill="none" stroke="#f87171" stroke-width="1.5" stroke-linecap="round"/>
+      <text x="536" y="222" fill="#fecaca" font-family="system-ui" font-size="7" font-weight="800">UNKNOWN</text>
+      <text x="536" y="231" fill="#fecaca" font-family="system-ui" font-size="7" font-weight="800">CALLER</text>
+    </g>
     <rect id="ws-cable" x="548" y="242" width="8" height="60" fill="#1f2937"/>
     <circle id="ws-port" cx="552" cy="306" r="5" fill="#4ade80"/>
   </g>
@@ -58,6 +63,7 @@ const ILLUSTRATION = `
     <rect id="pc-base" x="664" y="228" width="72" height="8" rx="3" fill="#2b3444"/>
     <rect id="pc-lid" x="668" y="192" width="64" height="40" rx="4" fill="#111827"/>
     <rect id="pc-screen" x="671" y="195" width="58" height="34" rx="2" fill="#0a1424"/>
+    <text id="pc-label" x="700" y="215" fill="#c4b5fd" font-family="system-ui" font-size="7" font-weight="800" text-anchor="middle"></text>
   </g>
 
   <!-- Transparent hit areas make the illustrated office directly interactive.
@@ -104,9 +110,11 @@ export class Env2D {
       wsScreen: document.getElementById('ws-screen'),
       wsLabel: document.getElementById('ws-label'),
       wsPhone: document.getElementById('ws-phone'),
+      wsPhoneAlert: document.getElementById('ws-phone-alert'),
       wsCable: document.getElementById('ws-cable'),
       wsPort: document.getElementById('ws-port'),
       pcScreen: document.getElementById('pc-screen'),
+      pcLabel: document.getElementById('pc-label'),
     };
     return this;
   }
@@ -130,8 +138,8 @@ export class Env2D {
         this._els.wsLabel.textContent = '';
       } else {
         this._els.wsScreen.setAttribute('fill', '#123a44');
-        this._els.wsLabel.textContent = 'NOVA';
-        this._els.wsLabel.setAttribute('fill', '#2dd4bf');
+        this._els.wsLabel.textContent = 'WINDOWS 11';
+        this._els.wsLabel.setAttribute('fill', '#60a5fa');
       }
     }
     if (id === 'cable') {
@@ -141,6 +149,7 @@ export class Env2D {
     if (id === 'cleanpc') {
       this._els.pcScreen.setAttribute('fill',
         st === 'login' ? '#0d1a30' : st === 'clean' ? '#123a44' : '#0a1424');
+      this._els.pcLabel.textContent = st === 'clean' ? 'LINUX' : '';
     }
   }
 
@@ -149,6 +158,8 @@ export class Env2D {
   ringPhone(on) {
     if (!this._els?.wsPhone) return;
     this._els.wsPhone.setAttribute('fill', on ? '#3b82f6' : '#2b3444');
+    this._els.wsPhone.classList.toggle('ringing', on);
+    this._els.wsPhoneAlert?.setAttribute('display', on ? 'inline' : 'none');
   }
 
   shake() { /* no motion in 2D mode by design */ }

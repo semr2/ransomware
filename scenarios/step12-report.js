@@ -5,6 +5,7 @@ export const step = {
   objective: 'Report what happened — accurately, with evidence.',
   hint: 'A useful report says what happened, what you did, and carries the original email as evidence.',
   enter(ctx) {
+    document.getElementById('screen-stage')?.classList.add('report-layout');
     ctx.desktop.show('Clean Laptop');
     ctx.desktop.setStatus('Clean device verified', 'clean');
     ctx.desktop.closeApps();
@@ -57,9 +58,10 @@ export const step = {
           attachment \u2192 security warning \u2192 files locked \u2192
           ${ctx.state.devices.workstation === 'isolated' ? 'network cable disconnected' : 'machine powered off'}.</p>`,
       choices: [{
-        label: 'OPEN THE FORM \u2192', kind: 'btn-primary', keepOpen: true,
-        onClick: () => ctx.toast('Fill in the form in the portal window, then press Submit Incident Report.'),
+        label: 'GOT IT — FILL IN THE PORTAL', kind: 'btn-primary',
       }],
+      className: 'report-instruction-panel',
+      collapsible: true,
       ariaLabel: 'Report the incident in the Northstar Security Operations Portal. Attach the original email as evidence.',
     });
   },

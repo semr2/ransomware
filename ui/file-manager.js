@@ -47,6 +47,13 @@ class FileManager {
       b.classList.toggle('active', b.dataset.folder === folder));
     const files = folder === 'downloads' ? DOWNLOADS : DOCUMENTS;
     this.gridEl.replaceChildren();
+    if (folder === 'downloads') {
+      const notice = document.createElement('div');
+      notice.className = 'download-notice';
+      notice.setAttribute('role', 'status');
+      notice.innerHTML = '<b>Download complete</b><span>Security_Update.exe was saved here from the email.</span>';
+      this.gridEl.appendChild(notice);
+    }
     for (const f of files) {
       const card = document.createElement('div');
       card.className = 'fm-file';
@@ -93,7 +100,7 @@ class FileManager {
       b.addEventListener('click', () => { audio.alert(); overlay.remove(); fn(); });
       actions.appendChild(b);
     };
-    mk('DISMISS', 'btn-danger', onDismiss);
+    mk('IGNORE WARNING', 'btn-danger', onDismiss);
     mk('DELETE', 'btn-secondary', onDelete);
     mk('REPORT', 'btn-primary', onReport);
     this.win.querySelector('.win-content').style.position = 'relative';

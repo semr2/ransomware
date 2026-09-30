@@ -83,7 +83,8 @@ export const step = {
           <p>The ransom screen blocks the desktop — network settings are unreachable.
           But the machine is still <b style="color:#f87171">connected</b>, and every second
           connected is a second the attack can spread to colleagues\u2019 machines.</p>
-          <p style="margin-top:10px">The physical controls are in front of you.</p>`,
+          <p style="margin-top:10px">Choose <b style="color:#fff">UNPLUG NETWORK CABLE</b>, then click
+          the highlighted cable beside the infected computer to disconnect it from the network.</p>`,
         choices: [
           { label: 'UNPLUG NETWORK CABLE', kind: 'btn-primary', onClick: () => arm('cable') },
           { label: 'POWER OFF COMPUTER', kind: 'btn-secondary', onClick: () => arm('power_button') },
@@ -120,8 +121,11 @@ export const step = {
         else if (id === 'power_button') powerOff();
       };
       ctx.sys.setActive([objectId]);
+      if (objectId === 'cable') {
+        ctx.sys.updateBadge('cable', { text: 'CLICK TO ISOLATE', kind: 'isolated' });
+      }
       ctx.toast(objectId === 'cable'
-        ? 'Now click the network cable to disconnect it.'
+        ? 'Click the highlighted network cable beside the infected computer to isolate it.'
         : 'Now click the power button on the dock.');
     };
 

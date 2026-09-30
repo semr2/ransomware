@@ -94,6 +94,37 @@ html.reduced-motion #hint-chip.visible { animation: none; }
   background: radial-gradient(700px 500px at 50% 40%, rgba(11, 21, 36, .35), rgba(11, 21, 36, .88));
 }
 #phone-layer.visible { display: flex; }
+#phone-layer.incoming-call-layer {
+  display: flex; align-items: flex-start; justify-content: flex-end;
+  padding: 76px 22px 18px; background: transparent; pointer-events: none;
+}
+.incoming-call-widget {
+  pointer-events: auto; width: 260px; padding: 12px;
+  border: 2px solid rgba(148, 163, 184, .55); border-radius: 30px;
+  background: linear-gradient(180deg, #111827, #020617); box-shadow: var(--shadow-lg), inset 0 0 0 4px rgba(255,255,255,.04);
+  transition: width .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.incoming-call-widget.hovered,
+.incoming-call-widget.pinned {
+  width: min(300px, 88vw); border-color: rgba(248, 113, 113, .72);
+  box-shadow: 0 0 34px rgba(248, 113, 113, .2), var(--shadow-lg), inset 0 0 0 4px rgba(255,255,255,.04);
+}
+.incoming-call-toggle {
+  display: flex; align-items: center; gap: 8px; width: 100%; min-height: 40px;
+  padding: 8px 10px; border: 0; border-radius: 8px; cursor: pointer;
+  background: rgba(239, 68, 68, .12); color: #fecaca;
+  font-size: 11px; font-weight: 800; letter-spacing: .06em; text-align: left;
+}
+.incoming-call-toggle .ring-icon { color: #f87171; font-size: 17px; }
+.incoming-call-toggle .toggle-caret { margin-left: auto; font-size: 16px; }
+.incoming-call-toggle:hover,
+.incoming-call-toggle:focus-visible { outline: 2px solid #f87171; background: rgba(239, 68, 68, .2); }
+.incoming-call-details { display: none; padding: 10px 4px 4px; }
+.incoming-call-widget.hovered .incoming-call-details,
+.incoming-call-widget.pinned .incoming-call-details { display: block; }
+.incoming-call-details p { margin: 0 2px 10px; color: #cbd5e1; font-size: 13px; line-height: 1.5; }
+.incoming-call-details .phone-actions { display: flex; flex-direction: column; gap: 8px; }
+html.reduced-motion .incoming-call-widget { transition: none; }
 .phone-device {
   width: 280px; border-radius: 38px; padding: 14px 12px 22px;
   background: linear-gradient(180deg, #1e293b, #0f172a);

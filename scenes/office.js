@@ -293,10 +293,15 @@ export class Env3D {
     const phoneG = new THREE.Group();
     phoneG.position.set(-0.62, .79, -2.95);
     const body = new THREE.Mesh(new THREE.BoxGeometry(.09, .015, .18), M.plastic());
-    const face = new THREE.Mesh(new THREE.PlaneGeometry(.075, .16), new THREE.MeshBasicMaterial({ color: 0x0a1220 }));
+    this.phoneScreenCanvas = document.createElement('canvas');
+    this.phoneScreenCanvas.width = 256;
+    this.phoneScreenCanvas.height = 512;
+    this.phoneScreenTexture = new THREE.CanvasTexture(this.phoneScreenCanvas);
+    this.phoneScreenTexture.colorSpace = THREE.SRGBColorSpace;
+    const face = new THREE.Mesh(new THREE.PlaneGeometry(.075, .16), new THREE.MeshBasicMaterial({ map: this.phoneScreenTexture }));
     face.rotation.x = -Math.PI / 2;
     face.position.y = .008;
-    this.phoneFaceMat = face.material;
+    this._paintPhoneScreen(false);
     phoneG.add(body, face);
     body.castShadow = true;
     this.scene.add(phoneG);
@@ -521,11 +526,46 @@ export class Env3D {
 
   ringPhone(on) {
     this._ringing = on;
-    if (on) {
-      this.phoneFaceMat.color.set(0x1d4ed8);
+    this._paintPhoneScreen(on);
+  }
+
+  _paintPhoneScreen(ringing) {
+    const canvas = this.phoneScreenCanvas;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#07111f';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#cbd5e1';
+    ctx.font = '20px system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('9:41', 128, 34);
+    if (ringing) {
+      ctx.fillStyle = '#fb7185';
+      ctx.beginPath();
+      ctx.arc(128, 150, 43, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 43px system-ui, sans-serif';
+      ctx.fillText('☎', 128, 165);
+      ctx.fillStyle = '#e2e8f0';
+      ctx.font = 'bold 25px system-ui, sans-serif';
+      ctx.fillText('UNKNOWN', 128, 246);
+      ctx.fillText('CALLER', 128, 278);
+      ctx.fillStyle = '#fda4af';
+      ctx.font = '19px system-ui, sans-serif';
+      ctx.fillText('INCOMING CALL', 128, 320);
+      ctx.fillStyle = '#64748b';
+      ctx.font = '16px system-ui, sans-serif';
+      ctx.fillText('Use the call prompt', 128, 440);
+      ctx.fillText('to answer', 128, 464);
     } else {
-      this.phoneFaceMat.color.set(0x0a1220);
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = 'bold 22px system-ui, sans-serif';
+      ctx.fillText('NORTHSTAR', 128, 235);
+      ctx.font = '18px system-ui, sans-serif';
+      ctx.fillText('Mobile', 128, 270);
     }
+    this.phoneScreenTexture.needsUpdate = true;
   }
 
   setObjectState(id, st) {
@@ -581,16 +621,18 @@ export class Env3D {
       unit.texture.needsUpdate = true;
       return;
     }
-    // Desktop / login / email / warning share the NOVA wallpaper base.
+    // The primary workstation presents a Windows-style desktop; the clean
+    // laptop presents Linux. Both run the same fictional Northstar training apps.
     const grad = ctx.createLinearGradient(0, 0, W, H);
     grad.addColorStop(0, '#0d1a30'); grad.addColorStop(1, '#123a44');
     ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
     ctx.fillStyle = 'rgba(45,212,191,.12)';
     ctx.beginPath(); ctx.arc(W * .78, H * .2, W * .18, 0, 7); ctx.fill();
-    ctx.fillStyle = '#2dd4bf';
+    const osName = isLaptop ? 'LINUX' : 'WINDOWS 11';
+    ctx.fillStyle = isLaptop ? '#c4b5fd' : '#60a5fa';
     ctx.font = `800 ${W / 14}px system-ui`;
     ctx.textAlign = 'left';
-    ctx.fillText('NOVA', 18, H * .22);
+    ctx.fillText(osName, 18, H * .22);
     ctx.font = `500 ${W / 34}px system-ui`;
     ctx.fillStyle = '#94a3b8';
     ctx.fillText('Secure Desktop', 19, H * .22 + W / 24);
@@ -603,18 +645,18 @@ export class Env3D {
       ctx.beginPath();
       ctx.roundRect(x, y, w, h, 9);
       ctx.fill();
-      ctx.fillStyle = '#0f766e';
+      ctx.fillStyle = isLaptop ? '#6d28d9' : '#2563eb';
       ctx.beginPath();
       ctx.roundRect(x, y, w, H * .11, [9, 9, 0, 0]);
       ctx.fill();
       ctx.fillStyle = '#f0fdfa';
       ctx.font = `700 ${W / 36}px system-ui`;
-      ctx.fillText('NOVA  /  SECURE TERMINAL', x + 12, y + H * .075);
+      ctx.fillText(`${osName}  /  NORTHSTAR WORKSPACE`, x + 12, y + H * .075);
       ctx.font = `600 ${W / 42}px ui-monospace, monospace`;
       ctx.fillStyle = '#334155';
       ctx.textAlign = 'left';
       ctx.fillText('Session: alice.chen  ·  Workstation ready', x + 14, y + H * .21);
-      ctx.fillStyle = '#0f766e';
+      ctx.fillStyle = isLaptop ? '#6d28d9' : '#2563eb';
       ctx.fillText('Security services active', x + 14, y + H * .31);
       ctx.fillText('Workspace: Northstar Operations', x + 14, y + H * .41);
       ctx.fillStyle = '#64748b';
@@ -674,7 +716,7 @@ export class Env3D {
       ctx.stroke();
       ctx.fillStyle = '#0f766e';
       ctx.font = `700 ${W / 30}px system-ui`; ctx.textAlign = 'center';
-      ctx.fillText('Clean device verified', W / 2, H * .58);
+      ctx.fillText('LINUX · CLEAN DEVICE VERIFIED', W / 2, H * .58);
     }
     unit.texture.needsUpdate = true;
   }
